@@ -25,8 +25,8 @@ export default function Banner (){
             fill={true}
             objectFit='cover'/>
             <div className={styles.bannerText}>
-                <h1 className='text-5xl text-yellow-400 font-extrabold font-serif'>where every event finds its venue</h1>
-                <h3 className='text-3xl text-yellow-400 font-extrabold  '>The journey has a starting point. Now they have met, and a new journey is about to take place.</h3>
+                <h1 className='max-w-sm mx-auto bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl shadow-xl text-white '>ค้นหาบริษัทที่ใช่สำหรับคุณ</h1>
+                <h3 className='max-w-sm mx-auto bg-gradient-to-r from-yellow-400 to-orange-500 p-6 rounded-2xl shadow-xl text-white'>ทุกสิ่งที่คุณควรรู้เกี่ยวกับหลากหลายบริษัท รวมไว้ในที่เดียว</h3>
             </div>
             {session?.user?.name && (
             <div className="z-20 absolute top-5 right-10 text-red-400 text-4xl font-bold">
