@@ -12,7 +12,6 @@ export default function Banner (){
 
     const {data:session} = useSession()
     console.log(session?.user.token)
-    console.log(session?.user.name)
 
     return(
         <div className={styles.banner} onClick={()=>{setIndex(index+1)}}>

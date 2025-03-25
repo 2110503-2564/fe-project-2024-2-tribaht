@@ -1,4 +1,4 @@
-import getVenues from "@/libs/getVenues"
+import getVenues from "@/libs/getCompanies"
 import VenueCatalog from "@/components/VenueCatalog"
 import { Suspense } from "react"
 import { LinearProgress } from "@mui/material"

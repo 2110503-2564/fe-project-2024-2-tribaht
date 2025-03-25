@@ -8,12 +8,13 @@ import { useState } from "react"
 import dayjs,{ Dayjs } from "dayjs"
 import { AppDispatch } from "@/redux/store"
 import { useDispatch } from "react-redux"
-import { BookingItem } from "../../../interface"
+import { BookingItem,CompanyItem } from "../../../interface"
 import { addBooking } from "@/redux/features/bookSlice"
 import { DatePicker } from "@mui/x-date-pickers"
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs'
 import { Select,MenuItem,TextField} from "@mui/material"
+import VenueDetaiPage from "../(venueinfo)/venue/[vid]/page"
 
 export default function Bookings(){
 
@@ -25,12 +26,25 @@ export default function Bookings(){
     const dispatch = useDispatch<AppDispatch>()
 
     const makeBooking = () => {
-        if(nameLastName && venue && tel && pickupDate){
-            const item:BookingItem = {
+        if(nameLastName && name && tel && pickupDate){
+            const item:CompanyItem = {
                 nameLastname: nameLastName,
                 tel: tel,
-                venue: venue,
-                bookDate:dayjs(pickupDate).format("DD/MM/YYYY"),
+                name: name,
+                bookDate: dayjs(pickupDate).format("DD/MM/YYYY"),
+                _id: "",
+                address: "",
+                district: "",
+                province: "",
+                postalcode: "",
+                website: "",
+                description: "",
+                picture: "",
+                dailyrate: 0,
+                __v: 0,
+                googleMapsLink: "",
+                id: "",
+                appointment: []
             }
             dispatch(addBooking(item))
         }
@@ -55,7 +69,7 @@ export default function Bookings(){
     return(
         <main className="w-[100%] flex flex-col items-center space-y-4">
             <div className="text-black text-xl font-medium">Venue Booking</div>
-            <div className="text-black text-xl font-medium">Venue: {venue}</div>
+            <div className="text-black text-xl font-medium">Venue:{venue}</div>
             
             <div className="w-fit space-y-2">
                 <TextField name="Name-Lastname" label="Name-Lastname" variant="standard" value={nameLastName} onChange={handleNameChange}/>

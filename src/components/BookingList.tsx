@@ -2,7 +2,7 @@
 import { AppDispatch, useAppSelector } from "@/redux/store"
 import {  useDispatch  } from "react-redux"
 import  { removeBooking } from "@/redux/features/bookSlice"
-import { BookingItem } from "../../interface"
+import { BookingItem,CompanyItem } from "../../interface"
  
 export default function BookingList(){
 
@@ -12,10 +12,10 @@ export default function BookingList(){
         <>
     
         {
-                venueItems.length == 0? 'No Venue Booking': venueItems.map((bookingItems: BookingItem) => (
+                venueItems.length == 0? 'No Venue Booking': venueItems.map((bookingItems: CompanyItem) => (
                 <div className="text-black bg-slate-200 rounded px-5 mx-5 py-2 my-2">
-                    {bookingItems.venue}
-                        <div className="text-xl">{bookingItems.nameLastname}</div>
+                    {bookingItems.name}
+                        <div className="text-xl">{bookingItems.name}</div>
                         <div className="text-xl">{bookingItems.tel}</div>
                         <div className="text-xl">{bookingItems.bookDate}
                         </div>

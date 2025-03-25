@@ -4,7 +4,6 @@ import { VenueItem, VenueJson } from "../../interface"
 
 export default async function VenueCatalog({venuesJson}:{venuesJson:Promise<VenueJson>}) {
     const venueJsonReady = await venuesJson
-    console.log(venueJsonReady.data);
     
     return(
         <>

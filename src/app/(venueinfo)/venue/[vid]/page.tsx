@@ -1,5 +1,5 @@
 import Image from "next/image"
-import getVenue from "@/libs/getVenue"
+import getVenue from "@/libs/getCompany"
 import Link from "next/link"
 
 

@@ -1,8 +1,8 @@
 import  { createSlice,PayloadAction} from "@reduxjs/toolkit"
-import { BookingItem } from "../../../interface"
+import { BookingItem,CompanyItem } from "../../../interface"
 
 type BookState={
-    bookItems:BookingItem[];
+    bookItems:CompanyItem[];
 }
 
 const initialState:BookState={bookItems:[]};
@@ -11,9 +11,9 @@ export const bookSlice = createSlice({
   name: "book",
   initialState,
   reducers: {
-    addBooking: (state, action: PayloadAction<BookingItem>) => {
+    addBooking: (state, action: PayloadAction<CompanyItem>) => {
       const index = state.bookItems.findIndex(
-        (item) => item.venue === action.payload.venue
+        (item) => item.name === action.payload.name
       );
       if (index !== -1) {
         
@@ -23,12 +23,12 @@ export const bookSlice = createSlice({
         state.bookItems.push(action.payload);
       }
     },
-    removeBooking: (state, action: PayloadAction<BookingItem>) => {
+    removeBooking: (state, action: PayloadAction<CompanyItem>) => {
         state.bookItems = state.bookItems.filter(
           (item) =>
             item.nameLastname !== action.payload.nameLastname ||
             item.tel !== action.payload.tel ||
-            item.venue !== action.payload.venue ||
+            item.name !== action.payload.name ||
             item.bookDate !== action.payload.bookDate
         );
     },
