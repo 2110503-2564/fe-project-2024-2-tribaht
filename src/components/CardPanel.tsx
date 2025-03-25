@@ -3,7 +3,7 @@ import Card from "@/components/Card";
 import { useReducer, useState } from "react";
 import Link from "next/link";
 import { useRef,useEffect } from "react";
-import getVenues from "@/libs/getVenues";
+import getVenues from "@/libs/getCompanies";
 import { VenueItem, VenueJson } from "../../interface";
 
 export default function CardPanel(){

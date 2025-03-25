@@ -165,7 +165,7 @@ export default function BookingList() {
         appointments.map((appt) => (
           <div key={appt._id} className="border p-4 rounded-xl shadow-md bg-white">
             <p className="text-lg font-semibold">📅 วันที่จอง: {new Date(appt.apptDate).toLocaleDateString()}</p>
-            <p className="text-gray-700">🏢 ชื่อบริษัท: {appt.company.name}</p>
+            <p className="text-gray-700">🏢 ชื่อบริษัท: {appt.company||'ไม่ทราบชื่อบริษัท'}</p>
             <button
               onClick={() => handleDelete(appt._id)}
               className="mt-3 px-4 py-2 bg-red-500 text-white font-semibold rounded-lg shadow hover:bg-red-600 transition"
