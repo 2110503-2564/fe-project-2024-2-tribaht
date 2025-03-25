@@ -29,14 +29,21 @@ export default async function VenueDetaiPage({params}:{params:{vid:string}}) {
                 <div className="text-md mx-5">District: { venueDetai.data.district  }</div>
                 <div className="text-md mx-5">Postalcode: { venueDetai.data.postalcode  }</div>
                 <div className="text-md mx-5">Tel: { venueDetai.data.tel  }</div>
-                <div className="text-md mx-5">Daily Rate: { venueDetai.data.dailyrate }</div>
+                {/* <div className="text-md mx-5">Daily Rate: { venueDetai.data.dailyrate }</div> */}
                 
-                <Link href={`/booking?id=${params.vid}&name=${venueDetai.data.name}`}>
-                <button name='Book Venue' className="block rounded-md bg-sky-600 hover:bg-indigo-600 px-3 py-2
-                        text-white shadow-sm">Make Venue
-                </button>  
+                <Link href={{
+                pathname: '/booking',
+                query: {
+                companyId: params.vid,
+                name: venueDetai.data.name,
+                tel: venueDetai.data.tel
+                }
+                }}>
+                    <button className="bg-blue-500 text-white p-2 rounded">
+                        จองสถานที่
+                    </button>
                 </Link>
-                </div>
+            </div>
 
                 
             </div>

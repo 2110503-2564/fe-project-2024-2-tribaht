@@ -1,100 +1,90 @@
-'use client'
-import DateReserve from "@/components/DateReserve"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions"
-import getUserProfile from "@/libs/getUserProfile"
-import { useSearchParams } from "next/navigation"
-import { useState } from "react"
-import dayjs,{ Dayjs } from "dayjs"
-import { AppDispatch } from "@/redux/store"
-import { useDispatch } from "react-redux"
-import { BookingItem,CompanyItem } from "../../../interface"
-import { addBooking } from "@/redux/features/bookSlice"
-import { DatePicker } from "@mui/x-date-pickers"
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
-import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs'
-import { Select,MenuItem,TextField} from "@mui/material"
-import VenueDetaiPage from "../(venueinfo)/venue/[vid]/page"
+'use client';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/redux/store';
+import { addAppointment } from '@/redux/features/bookSlice';
+import { useSession } from 'next-auth/react';
+import { useState } from 'react';
 
-export default function Bookings(){
+export default function BookingPage() {
+  const params = useSearchParams();
+  const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
+  const { data: session } = useSession();
 
-    const [pickupDate, setPickupDate] = useState<Dayjs | null>(null)
-    const [nameLastName, setNameLastName] = useState("")
-    const [tel, setTel] = useState("")
-    const [venue, setVenue] = useState("Bloom")
+  const [apptDate, setApptDate] = useState<string>(new Date().toISOString().split('T')[0]); // กำหนดค่าเริ่มต้นเป็นวันที่ปัจจุบัน
 
-    const dispatch = useDispatch<AppDispatch>()
+  const handleConfirm = async () => {
+    const companyId = params.get('companyId');
+    const userId = session?.user?.id; // ใช้ user id จาก session
 
-    const makeBooking = () => {
-        if(nameLastName && name && tel && pickupDate){
-            const item:CompanyItem = {
-                nameLastname: nameLastName,
-                tel: tel,
-                name: name,
-                bookDate: dayjs(pickupDate).format("DD/MM/YYYY"),
-                _id: "",
-                address: "",
-                district: "",
-                province: "",
-                postalcode: "",
-                website: "",
-                description: "",
-                picture: "",
-                dailyrate: 0,
-                __v: 0,
-                googleMapsLink: "",
-                id: "",
-                appointment: []
-            }
-            dispatch(addBooking(item))
-        }
+    if (!companyId) {
+      alert('ไม่พบรหัสบริษัท');
+      return;
     }
 
+    if (!userId) {
+      alert('ไม่พบรหัสผู้ใช้ กรุณาเข้าสู่ระบบอีกครั้ง');
+      return;
+    }
 
-    const handleNameChange = (event:React.ChangeEvent<HTMLInputElement>)=>{
-        setNameLastName(event.target.value);
-    };
-    
-      const handleTelChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setTel(event.target.value);
-      };
-    
-      const handleVenueChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-        setVenue(event.target.value as string);
-      };
-    
-      const handleDateChange = (value: Dayjs | null) => {
-        setPickupDate(value);
-      };
-    return(
-        <main className="w-[100%] flex flex-col items-center space-y-4">
-            <div className="text-black text-xl font-medium">Venue Booking</div>
-            <div className="text-black text-xl font-medium">Venue:{venue}</div>
-            
-            <div className="w-fit space-y-2">
-                <TextField name="Name-Lastname" label="Name-Lastname" variant="standard" value={nameLastName} onChange={handleNameChange}/>
-                <TextField name="Contact-Number" label="Contact-Number" variant="standard" value={nameLastName} onChange={handleTelChange} />
-                <div className="text-md text-left text-gray-600">Pick-Up Date and Location</div>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DatePicker
-                        label="Pick a Date"
-                        value={pickupDate}
-                        onChange={handleDateChange}/>
-                </LocalizationProvider>
-                <Select
-                        label="Venue"
-                        value={venue}
-                        onChange={(e)=>{setVenue(e.target.value);{handleVenueChange}}}>
-                        <MenuItem value="Bloom">The Bloom Pavilion</MenuItem>
-                        <MenuItem value="Spark">Spark Space</MenuItem>
-                        <MenuItem value="GrandTable">The Grand Table</MenuItem>
-        </Select>
-            </div>
+    if (!session?.user?.token) {
+      alert('ไม่พบ Token กรุณาเข้าสู่ระบบอีกครั้ง');
+      return;
+    }
 
-            <button name='Book Venue' className="block rounded-md bg-sky-600 hover:bg-indigo-600 px-3 py-2
-            text-white shadow-sm" onClick={makeBooking}>Booking this Venue
-            </button>  
+    try {
+      const response = await fetch(
+        `http://localhost:5003/api/v1/companies/${companyId}/appointments/`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.user.token}`  // ✅ เพิ่ม Token ตรงนี้
+          },
+          body: JSON.stringify({
+            apptDate: apptDate,
+            user: userId
+          })
+        }
+      );
 
-        </main>
-    )
+      const result = await response.json();
+
+      if (result.success) {
+        dispatch(addAppointment(result.data));
+        router.push('/mybooking');
+      } else {
+        alert('การจองล้มเหลว: ' + (result.message || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Booking error:', error);
+      alert('เกิดข้อผิดพลาดในการจอง');
+    }
+  };
+
+  return (
+    <div className="p-4">
+      <h1 className="text-xl font-bold">ยืนยันการจอง</h1>
+      <div className="my-4">
+        <p>สถานที่: {params.get('name')}</p>
+        <div>
+          <label htmlFor="apptDate" className="block">เลือกวันที่จอง:</label>
+          <input
+            type="date"
+            id="apptDate"
+            value={apptDate}
+            onChange={(e) => setApptDate(e.target.value)} // อัพเดตวันที่ที่เลือก
+            className="border p-2 rounded"
+          />
+        </div>
+        <button 
+          onClick={handleConfirm}
+          className="mt-4 bg-green-500 text-white p-2 rounded"
+        >
+          ยืนยันการจอง
+        </button>
+      </div>
+    </div>
+  );
 }

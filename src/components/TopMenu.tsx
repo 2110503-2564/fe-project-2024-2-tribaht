@@ -19,7 +19,7 @@ export default async function TopMenu() {
                 <Link href="/api/auth/signin" className="text-cyan-600 text-sm font-semibold">
                     Sign-In
                 </Link>
-                <Link href="/api/auth/register" className="text-cyan-600 text-sm font-semibold">
+                <Link href="/register" className="text-cyan-600 text-sm font-semibold">
                     Register
                 </Link>
                 </>
@@ -29,8 +29,9 @@ export default async function TopMenu() {
 
             <div className="flex-1 flex justify-end">
             <div className="flex space-x-6 text-sm font-bold text-gray-800">
-            <TopMenuItem title="Booking" pageRef="/booking"/>
+            <TopMenuItem title="Booking" pageRef="/venue"/>
             </div>
+                <Link href="/"> {/* เพิ่ม Link ครอบ Image */}
                 <Image 
                     src="/img/logo.png"
                     alt="logo"
@@ -38,6 +39,7 @@ export default async function TopMenu() {
                     height={40}
                     className="h-auto w-auto"
                 />
+                </Link>
             </div>
         </div>
     );
