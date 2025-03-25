@@ -1,118 +1,176 @@
+// 'use client';
+// import { useEffect, useState } from 'react';
+// import { useAppSelector } from '@/redux/store';
+// import { useDispatch } from 'react-redux';
+// import { AppDispatch } from '@/redux/store';
+// import { setAppointments } from '@/redux/features/bookSlice';
+// import { AppointmentItem } from '@/../interface';
+// import { useSession } from 'next-auth/react';
+
+// export default function BookingList() {
+//   const dispatch = useDispatch<AppDispatch>();
+//   const { data: session } = useSession();  // ใช้ session จาก next-auth
+//   const [loading, setLoading] = useState(true);  // สถานะการโหลดข้อมูล
+//   const [appointments, setAppointmentsState] = useState<AppointmentItem[]>([]); // สถานะสำหรับการเก็บข้อมูลการจอง
+
+//   useEffect(() => {
+//     const fetchAppointments = async () => {
+//       if (!session?.user?.token) {
+//         alert('กรุณาเข้าสู่ระบบ');
+//         return;
+//       }
+
+//       setLoading(true); // เริ่มต้นสถานะการโหลดข้อมูล
+
+//       try {
+//         // ดึงข้อมูลการจองจาก API
+//         const response = await fetch('http://localhost:5003/api/v1/appointments', {
+//           headers: {
+//             'Authorization': `Bearer ${session.user.token}`,  // ส่ง token สำหรับการ authorize
+//           },
+//         });
+
+//         if (response.ok) {
+//           const result = await response.json();
+//           setAppointmentsState(result.data);  // ตั้งค่าข้อมูลการจอง
+//           dispatch(setAppointments(result.data));  // ส่งข้อมูลไปยัง Redux store
+//         } else {
+//           console.error('ไม่สามารถดึงข้อมูลการจองได้');
+//         }
+//       } catch (error) {
+//         console.error('เกิดข้อผิดพลาดในการดึงข้อมูล:', error);
+//       } finally {
+//         setLoading(false); // หยุดสถานะการโหลดข้อมูล
+//       }
+//     };
+
+//     fetchAppointments();
+//   }, [session, dispatch]);  // จะทำงานเมื่อ session หรือ dispatch เปลี่ยนแปลง
+
+//   if (loading) {
+//     return <p>กำลังโหลดข้อมูล...</p>;  // ข้อความขณะโหลดข้อมูล
+//   }
+
+//   return (
+//     <div className="space-y-4">
+//       {appointments.length === 0 ? (
+//         <p>ยังไม่มีรายการจอง</p>  // ถ้าไม่มีข้อมูลการจอง
+//       ) : (
+//         appointments.map((appt) => (
+//           <div key={appt._id} className="border p-4 rounded-lg">
+//             <p>วันที่จอง: {new Date(appt.apptDate).toLocaleDateString()}</p>
+//             <p>ชื่อบริษัท: {appt.companyName || 'ไม่ทราบชื่อบริษัท'}</p>
+//             {/* คุณสามารถเพิ่มปุ่มหรือฟังก์ชันอื่น ๆ ที่ต้องการที่นี่ */}
+//           </div>
+//         ))
+//       )}
+//     </div>
+//   );
+// }
 'use client';
 import { useEffect, useState } from 'react';
 import { useAppSelector } from '@/redux/store';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/redux/store';
-import { setAppointments, removeAppointment } from '@/redux/features/bookSlice';
+import { setAppointments } from '@/redux/features/bookSlice';
 import { AppointmentItem } from '@/../interface';
 import { useSession } from 'next-auth/react';
 
-interface Company {
-  _id: string;
-  name: string;
-}
-
 export default function BookingList() {
-  const appointments = useAppSelector(state => state.book.appointments);
   const dispatch = useDispatch<AppDispatch>();
-  const { data: session } = useSession();
-
-  // Add loading state for UI feedback
-  const [loading, setLoading] = useState(true);
+  const { data: session } = useSession();  // ใช้ session จาก next-auth
+  const [loading, setLoading] = useState(true);  // สถานะการโหลดข้อมูล
+  const [appointments, setAppointmentsState] = useState<AppointmentItem[]>([]); // สถานะสำหรับการเก็บข้อมูลการจอง
 
   useEffect(() => {
     const fetchAppointments = async () => {
-      if (!session?.user?.token) return;
+      if (!session?.user?.token) {
+        alert('กรุณาเข้าสู่ระบบ');
+        return;
+      }
 
-      setLoading(true); // Start loading
+      setLoading(true); // เริ่มต้นสถานะการโหลดข้อมูล
 
       try {
-        // Make API request to fetch appointments for the logged-in user
-        const appointmentsRes = await fetch(`http://localhost:5003/api/v1/appointments`, {
-          headers: { 'Authorization': `Bearer ${session.user.token}` }
+        // ดึงข้อมูลการจองจาก API
+        const response = await fetch('http://localhost:5003/api/v1/appointments', {
+          headers: {
+            'Authorization': `Bearer ${session.user.token}`,  // ส่ง token สำหรับการ authorize
+          },
         });
 
-        const companiesRes = await fetch(`http://localhost:5003/api/v1/companies`);
-        const appointmentsResult = await appointmentsRes.json();
-        const companiesResult = await companiesRes.json();
-
-        if (appointmentsRes.ok && companiesRes.ok) {
-          const companyMap: Record<string, string> = {};
-          companiesResult.data.forEach((company: Company) => {
-            companyMap[company._id] = company.name;
-          });
-
-          // Add company name to each appointment data
-          const updatedAppointments = appointmentsResult.data.map((appt: AppointmentItem) => ({
-            ...appt,
-            companyName: companyMap[appt.company] || 'ไม่ทราบชื่อบริษัท'
-          }));
-
-          // Dispatch to store
-          dispatch(setAppointments(updatedAppointments));
+        if (response.ok) {
+          const result = await response.json();
+          setAppointmentsState(result.data);  // ตั้งค่าข้อมูลการจอง
+          dispatch(setAppointments(result.data));  // ส่งข้อมูลไปยัง Redux store
         } else {
-          console.error('Error fetching data');
+          console.error('ไม่สามารถดึงข้อมูลการจองได้');
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('เกิดข้อผิดพลาดในการดึงข้อมูล:', error);
       } finally {
-        setLoading(false); // Stop loading when data is fetched
+        setLoading(false); // หยุดสถานะการโหลดข้อมูล
       }
     };
 
     fetchAppointments();
-  }, [dispatch, session]);
+  }, [session, dispatch]);  // จะทำงานเมื่อ session หรือ dispatch เปลี่ยนแปลง
 
-  const handleCancel = async (appointmentId: string) => {
+  // ฟังก์ชันการลบการจอง
+  const handleDelete = async (id: string) => {
     if (!session?.user?.token) {
-      alert('ไม่พบ Token กรุณาเข้าสู่ระบบอีกครั้ง');
+      alert('กรุณาเข้าสู่ระบบ');
       return;
     }
 
+    const confirmDelete = window.confirm('คุณต้องการลบการจองนี้หรือไม่?');
+    if (!confirmDelete) return;  // ถ้าไม่ยืนยันการลบจะไม่ทำการลบ
+
+    setLoading(true);  // ตั้งค่าสถานะการโหลดใหม่
+
     try {
-      const response = await fetch(
-        `http://localhost:5003/api/v1/appointments/${appointmentId}`,
-        {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session.user.token}`,
-          },
-        }
-      );
+      const response = await fetch(`http://localhost:5003/api/v1/appointments/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${session.user.token}`,  // ส่ง token สำหรับการ authorize
+        },
+      });
 
-      const result = await response.json();
-
-      if (response.ok && result.success) {
-        dispatch(removeAppointment(appointmentId));
-        alert('การจองถูกยกเลิกเรียบร้อยแล้ว');
+      if (response.ok) {
+        // ลบการจองจาก state
+        setAppointmentsState((prevAppointments) =>
+          prevAppointments.filter((appt) => appt._id !== id)
+        );
+        dispatch(setAppointments(appointments.filter((appt) => appt._id !== id))); // ส่งข้อมูลที่อัปเดตไปยัง Redux
+        alert('ลบการจองสำเร็จ');
       } else {
-        alert('ไม่สามารถยกเลิกการจองได้: ' + (result.message || 'Unknown error'));
+        console.error('ไม่สามารถลบการจองได้');
       }
     } catch (error) {
-      console.error('Error canceling booking:', error);
-      alert('เกิดข้อผิดพลาดในการยกเลิกการจอง');
+      console.error('เกิดข้อผิดพลาดในการลบการจอง:', error);
+    } finally {
+      setLoading(false);  // หยุดสถานะการโหลด
     }
   };
 
   if (loading) {
-    return <p>กำลังโหลดข้อมูล...</p>;
+    return <p>กำลังโหลดข้อมูล...</p>;  // ข้อความขณะโหลดข้อมูล
   }
 
   return (
     <div className="space-y-4">
       {appointments.length === 0 ? (
-        <p>ยังไม่มีรายการจอง</p>
+        <p>ยังไม่มีรายการจอง</p>  // ถ้าไม่มีข้อมูลการจอง
       ) : (
-        appointments.map(appt => (
+        appointments.map((appt) => (
           <div key={appt._id} className="border p-4 rounded-lg">
             <p>วันที่จอง: {new Date(appt.apptDate).toLocaleDateString()}</p>
-            <p>ชื่อบริษัท: {appt.companyName}</p>
+            <p>ชื่อบริษัท: {appt.companyName || 'ไม่ทราบชื่อบริษัท'}</p>
             <button
-              onClick={() => handleCancel(appt._id)}
-              className="mt-2 bg-red-500 text-white p-1 rounded"
+              onClick={() => handleDelete(appt._id)}
+              className="text-red-500 mt-2 p-2 border rounded hover:bg-red-100"
             >
-              ยกเลิกการจอง
+              ลบ
             </button>
           </div>
         ))
@@ -120,99 +178,3 @@ export default function BookingList() {
     </div>
   );
 }
-
-
-
-// 'use client';
-// import { useEffect, useState } from 'react';
-// import { useAppSelector } from '@/redux/store';
-// import { useDispatch } from 'react-redux';
-// import { AppDispatch } from '@/redux/store';
-// import { setAppointments, removeAppointment } from '@/redux/features/bookSlice';
-// import { AppointmentItem } from '@/../interface';
-// import { useSession } from 'next-auth/react';
-
-// interface Company {
-//   _id: string;
-//   name: string;
-// }
-
-// export default function BookingList() {
-//   const appointments = useAppSelector(state => state.book.appointments);
-//   const dispatch = useDispatch<AppDispatch>();
-//   const { data: session } = useSession();
-//   const [companyData, setCompanyData] = useState<Record<string, string>>({});
-
-//   useEffect(() => {
-//     const fetchAppointments = async () => {
-//       if (!session?.user?.token) return;
-
-//       try {
-//         const [appointmentsRes, companiesRes] = await Promise.all([
-//           fetch(`http://localhost:5003/api/v1/appointments`, {
-//             headers: { 'Authorization': `Bearer ${session.user.token}` }
-//           }),
-//           fetch(`http://localhost:5003/api/v1/companies`)
-//         ]);
-
-//         const appointmentsResult = await appointmentsRes.json();
-//         const companiesResult = await companiesRes.json();
-
-//         if (appointmentsRes.ok && companiesRes.ok) {
-//           const companyMap: Record<string, string> = {};
-//           companiesResult.data.forEach((company: Company) => {
-//             companyMap[company._id] = company.name;
-//           });
-
-//           const updatedAppointments = appointmentsResult.data.map((appt: AppointmentItem) => ({
-//             ...appt,
-//             companyName: companyMap[appt.company] || 'ไม่ทราบชื่อบริษัท'
-//           }));
-
-//           dispatch(setAppointments(updatedAppointments));
-//         } else {
-//           console.error('Error fetching data');
-//         }
-//       } catch (error) {
-//         console.error('Error fetching data:', error);
-//       }
-//     };
-
-//     fetchAppointments();
-//   }, [dispatch, session]);
-
-//   const handleCancel = async (appointmentId: string) => {
-//     if (!session?.user?.token) {
-//       alert('ไม่พบ Token กรุณาเข้าสู่ระบบอีกครั้ง');
-//       return;
-//     }
-
-//     // ลบรายการการจองออกจาก state ทันที (UI update)
-//     dispatch(removeAppointment(appointmentId));
-
-//     // ไม่ต้องไปเรียก API สำหรับการยกเลิกที่ backend
-//     alert('การจองถูกยกเลิกเรียบร้อยแล้ว');
-//   };
-
-//   return (
-//     <div className="space-y-4">
-//       {appointments.length === 0 ? (
-//         <p>ยังไม่มีรายการจอง</p>
-//       ) : (
-//         appointments.map(appt => (
-//           <div key={appt._id} className="border p-4 rounded-lg">
-//             <p>วันที่จอง: {new Date(appt.apptDate).toLocaleDateString()}</p>
-//             <p>ชื่อบริษัท: {appt.companyName}</p>
-//             <button
-//               onClick={() => handleCancel(appt._id)}
-//               className="mt-2 bg-red-500 text-white p-1 rounded"
-//             >
-//               ยกเลิกการจอง
-//             </button>
-//           </div>
-//         ))
-//       )}
-//     </div>
-//   );
-// }
-
