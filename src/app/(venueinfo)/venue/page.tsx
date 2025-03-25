@@ -10,7 +10,7 @@ export default async function Venue(){
     
     return(
         <main className="text-center p-5 text-black">
-            <h1 className="text-xl font-medium">Select Your VenueBooking</h1>
+            <h1 className="text-xl font-medium">Select Your Booking</h1>
             <Suspense fallback={<p>Loding ...<LinearProgress/></p>}>
             <VenueCatalog venuesJson ={venues} />
             </Suspense>

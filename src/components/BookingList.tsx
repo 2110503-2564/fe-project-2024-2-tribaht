@@ -159,22 +159,23 @@ export default function BookingList() {
 
   return (
     <div className="space-y-4">
-      {appointments.length === 0 ? (
-        <p>ยังไม่มีรายการจอง</p>  // ถ้าไม่มีข้อมูลการจอง
+      {appointments?.length === 0 ? (
+        <p className="text-gray-500 text-center">ยังไม่มีรายการจอง</p>
       ) : (
         appointments.map((appt) => (
-          <div key={appt._id} className="border p-4 rounded-lg">
-            <p>วันที่จอง: {new Date(appt.apptDate).toLocaleDateString()}</p>
-            <p>ชื่อบริษัท: {appt.companyName || 'ไม่ทราบชื่อบริษัท'}</p>
+          <div key={appt._id} className="border p-4 rounded-xl shadow-md bg-white">
+            <p className="text-lg font-semibold">📅 วันที่จอง: {new Date(appt.apptDate).toLocaleDateString()}</p>
+            <p className="text-gray-700">🏢 ชื่อบริษัท: {appt.company.name}</p>
             <button
               onClick={() => handleDelete(appt._id)}
-              className="text-red-500 mt-2 p-2 border rounded hover:bg-red-100"
+              className="mt-3 px-4 py-2 bg-red-500 text-white font-semibold rounded-lg shadow hover:bg-red-600 transition"
             >
-              ลบ
+              ลบ 🗑️
             </button>
           </div>
         ))
       )}
     </div>
   );
+  
 }
